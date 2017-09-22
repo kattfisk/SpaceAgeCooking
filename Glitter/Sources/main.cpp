@@ -22,12 +22,15 @@ const GLchar* vertex_source = R"glsl(
 )glsl";
 const GLchar* fragment_source = R"glsl(
 	#version 400 core
-	uniform vec3 color;
+	uniform vec3 base_color;
 	out vec4 out_color;
 
 	void main()
 	{
-		out_color = vec4(color, 1.0f);
+		float ambient_intensity = 0.1;
+		// TODO: add light color
+		vec3 ambient = base_color * ambient_intensity;
+		out_color = vec4(base_color, 1.0f);
 	}
 )glsl";
 
@@ -90,16 +93,33 @@ int main(int, char**) {
 	fprintf(stderr, "OpenGL %s\n", glGetString(GL_VERSION));
 
 	// Data specification
+	// TODO: add normals per face, duplicate vertices per face
+	// TODO: update VBO
 	float vertices[] = {
-		0.5f,  0.5f, 0.0f,  // top right
-		0.5f, -0.5f, 0.0f,  // bottom right
-		-0.5f, -0.5f, 0.0f,  // bottom left
-		-0.5f,  0.5f, 0.0f   // top left
+		0.5f,  0.5f, 0.0f,  // front top right
+		0.5f, -0.5f, 0.0f,  // front bottom right
+		-0.5f, -0.5f, 0.0f,  // front bottom left
+		-0.5f,  0.5f, 0.0f,   // front top left
+		0.5f,  0.5f, -1.0f,  // back top right
+		0.5f, -0.5f, -1.0f,  // back bottom right
+		-0.5f, -0.5f, -1.0f,  // back bottom left
+		-0.5f,  0.5f, -1.0f   // back top left
 	};
 	unsigned int indices[] = {
-			0, 1, 3, // first triangle
-	        1, 2, 3 // second triangle
+			0, 1, 2, // front
+	        2, 3, 0,
+			4, 5, 1, // right
+			1, 0, 4,
+			7, 6, 5, // back
+			5, 4, 7,
+			3, 2, 6, // left
+			6, 7, 3,
+			4, 0, 3, // top
+			3, 7, 4,
+			1, 5, 6, // bottom
+			6, 2, 1
 	};
+	const unsigned int NUMBER_OF_INDICES = 6*6;
 
 	// Create vertex array object to store settings
 	GLuint vao;
@@ -175,10 +195,11 @@ int main(int, char**) {
 
 	// Set up and enable attribute array
 	GLint position_attrib = glGetAttribLocation(shader_program, "position");
+	// TODO: need to set stride here?
 	glVertexAttribPointer(position_attrib, 3, GL_FLOAT, GL_FALSE, 0, 0);
 	glEnableVertexAttribArray(position_attrib);
-	GLint color_uniform = glGetUniformLocation(shader_program, "color");
-	glUniform3f(color_uniform, 0.1f, 0.8f, 0.8f);
+	GLint base_color = glGetUniformLocation(shader_program, "base_color");
+	glUniform3f(base_color, 0.1f, 0.8f, 0.8f);
 
 	// Rendering Loop
 	while (glfwWindowShouldClose(mWindow) == false)
@@ -194,7 +215,7 @@ int main(int, char**) {
 
 		// Draw geometry
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_TRIANGLES, NUMBER_OF_INDICES, GL_UNSIGNED_INT, 0);
 
 		// Flip Buffers and Draw
 		glfwSwapBuffers(mWindow);

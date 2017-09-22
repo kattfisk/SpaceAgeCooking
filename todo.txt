@@ -1,6 +1,8 @@
-Lighting
-
+3D geometry
+Basic lighting, ambient + diffuse
+Instancing
+Remove bullet from project
+Move graphics code to separate object
 ---
-https://learnopengl.com/#!Getting-started/Hello-Triangle
-https://learnopengl.com/code_viewer_gh.php?code=src/1.getting_started/2.2.hello_triangle_indexed/hello_triangle_indexed.cpp
+https://learnopengl.com
 https://www.khronos.org/registry/OpenGL-Refpages/gl4/
