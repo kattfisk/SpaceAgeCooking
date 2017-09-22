@@ -1,1 +1,0 @@
-lib/libassimpd.a lib/libglfw3.a lib/libBulletDynamicsd.a lib/libBulletCollisiond.a lib/libLinearMathd.a lib/libzlibstaticd.a -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32 
